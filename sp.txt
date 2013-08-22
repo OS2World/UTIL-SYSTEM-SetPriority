@@ -1,0 +1,149 @@
+SetPriority Version 1.03 by Jens Glathe 05-16-1995
+
+This is a utility to start a program at a defined priority.  It is also able to
+start a VDM (DOS-session) at a defined priority.
+
+What's new:
+
+There was a bug in the VDD "VDOSPRIO.SYS" (Version 1.0).  It has been rewritten
+completely.  A bug fix for the IdleCall (AX=1680h, Int 2F) in OS/2 version 2.1
+has been added (Version 2.0 of VDOSPRIO.SYS)
+An interface to query the actual priority of a DOS-Session has been added 
+(Version 2.2 of VDOSPRIO.SYS).
+Some error messages have been added to spdos.exe.
+
+The file sp103.zip contains:
+
+sp.exe OS/2 executable
+
+spdos.exe DOS executable to start a DOS session with other priority
+
+vdosprio.sys Virtual Device Driver for the DOS sessions (MUST be loaded to
+change the priority)
+
+setprio.pas, setprio.tpu,
+
+prioint.asm, prioint.obj source for the library used by spdos.exe
+
+setprio.c C header for communication with VDOSPRIO.SYS
+
+sp.doc this file.
+
+\emxdll\*.dll EMX- DLLs needed.  If these are not in your system or newer ones,
+copy them to a directory reachable by LIBPATH.  WARNING:  Do not use more than
+one version of EMX-DLLs!  This package was compiled using EMX-GCC 0.9a.
+
+Usage of sp:
+
+SP <class>[delta] <sessiontype> <program> [args...]
+
+<class>:  n=no change, i=idle, r=regular, f=foreground, t=time critical
+[delta]:  Any number from -31 to 31, 0 to 31 for DOS sessions <sessiontype>:
+o=OS/2 Window or PM App, d=DOS-Window, D=DOS-Fullscreen <program>:  Executable
+or Batchfile (OS/2 only) with full path
+
+The driver "VDOSPRIO.SYS" must have been loaded to change the priority of a DOS
+session.
+
+If a DOS session shall be started, sp invokes spdos.exe, which sets the
+priority of the VDM and executes the program.
+
+You can use spdos directly:
+
+SPDOS <class>[delta] <program_with_path_and_extension> [args...]
+
+If you want to run batch files, use:
+
+SPDOS <class>[delta] <path>\command.com /c <batchfile> [options]
+
+Requirements:
+
+OS/2 version 2.x. or higher. sp.exe and spdos.exe must be reachable by PATH or
+in the same directory.  DEVICE=(path)vdosprio.sys in your config.sys file.
+
+Notes:
+
+The VDD hooks the DOS Int 45h to get a connection to the VDM.  I hope that
+nobody uses this Interrupt.  If there are problems with this Interrupt,
+recompile the VDD and the pascal library for another Interrupt. To obtain the 
+source code, just contact me by e-mail.
+
+If you set a DOS session which has an idle loop consuming full cpu time (such
+as the Turbo IDE) to time critical (highest) priority, the system gets in
+trouble.  Setting the priority to r31 is enough, f is also allowed.
+
+There is another priority class for VDM's:  SIMULATED INTERRUPT, but it doesn't
+seem to work.  Therefore the sp utility doesn't support it.
+
+The Command-line parsing of SP is not very save:  You can get strange errors
+(such as illegal NPX instruction) when running SP with wrong arguments.
+
+FOR PROGRAMMERS WHO WANT TO USE THE VDOSPRIO DRIVER DIRECTLY:
+
+The driver can be called by Int 45h.  The parameters are:
+
+AX:  Class
+
+Possible values are:
+
+1H:  Idle Class.  2H:  Regular Class.  3H:  Time-Critical Class.  Highest
+Priority class 4H:  Foreground Server Class.  5H:  Simulated Interrupt Class.
+1680H:  Perform a task switch to another task (Try to give up the CPU).
+
+DX:  Offset
+
+Possible values are:
+
+0..1Fh:  absolute Offset for this Class
+
+Return values:
+
+AX=1:  Success.  AX=0:  An error occured.  No actions taken.
+
+There is a better description and a pascal/c interface included with this
+package (Files setprio.pas and setprio.h, but partially in german :-) ).
+
+DISCLAIMER OF WARRANTIES:
+
+(I don't write legal stuff in a foreign language, sorry):
+----------------------------------------------------------------------
+
+Ich uebernehme keinerlei Gewaehrleistung fÅr korrekte Funktion oder
+irgendwelche daraus resultierenden Schaeden oder Folgeschaeden.  Es liegt in
+der Natur von Geraetettreibern, dass dadurch die Integritaet des Systems
+verletzt werden kann.
+
+Licence:  --------
+
+This is freeware. A postcard from your home town would be nice.
+
+Bug reports, hints, sourcecode queries, suggestions etc.:
+
+Send it to me:
+
+Internet:  jensajce@w271zrz.ZRZ.TU-Berlin.de
+
+Normal letter:
+
+Jens Glathe
+Keithstr.  36 Apt.  604
+D-10787 Berlin
+Germany
+
+Phone:  (030) 262 75 33
+
+
+Debug-O-History:
+
+The Version 1.03 has a VDD for the DOS sessions with more functionality.
+Some error messages have been added to spdos.exe.
+No new bugs found.
+
+The Version 1.02 contains a completely rewritten VDD for the DOS sessions
+(VDOSPRIO.SYS version 2.0).
+
+The Version 1.01 has a minor bug fix in spdos.exe.  There was a problem passing
+argv[1] to the DOS program started.
+
+The initial code used as a base for sp.exe is from Scott Dudley, thanks to him.
+

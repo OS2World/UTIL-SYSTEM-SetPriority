@@ -1,0 +1,32 @@
+/* Das ist der Aufruf zum Setzen der PrioritÑt. Zu diesem Zweck mu· der Trei-*/
+/* ber "vdosprio.sys" beim Booten des Systems geladen worden sein (in CONFIG */
+/* .SYS: DEVICE=<Pfad>VDOSPRIO.SYS) Der PrioritÑtsmechanismus von OS/2 unter-*/
+/* scheidet mehrere Klassen, und in diesen Klassen wiederum Stufen. Klasse  */
+/* und Stufe mÅssen beim Aufruf Åbergeben werden. Folgende Werte sind hier */
+/* erlaubt:                                                                */
+
+/* Class:
+		1		Idle (geringste PrioritÑt)
+		2		RegulÑr (Standard)
+		3		Zeitkritisch	(hîchste PrioritÑt, sehr gefÑhrlich!!)
+		4		Server (Vordergrund, kommt nach RegulÑr)
+		5		Simulierter Interrupt (???)
+		1680h		versuche, einen Taskwechsel auszufÅhren (Bugfix)
+
+		Andere Werte sind nicht definiert.
+
+		Delta:
+		0..31 Abstufungen in einer Klasse (0 kleinste, 31 hîchste PrioritÑt)
+
+		Normalerweise werden DOS-Sitzungen mit Klasse 2 und Delta 0 gestartet.
+
+		Vorsicht!! Wenn das Programm auf erhîhter PrioritÑt lÑuft und stÑndig
+		Zeit verbraucht, dann kommen andere Programme nicht mehr (oder nur sel-
+		ten) ran!!                                                             */
+
+extern BOOL Far Pascal SetPriority(unsigned long Class, unsigned long Delta);
+extern void Far Pascal GetPriority((unsigned long)* Class, (unsigned long) * Delta);
+
+/* CAUTION: this header file hasn't been tested yet (never had the need to write
+DOS programs in C :-)), so there could be errors. Please refer to prioint.asm
+for the actions taken to communicate with VDOSPRIO.SYS.                      */
