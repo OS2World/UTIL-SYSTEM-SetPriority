@@ -5,7 +5,7 @@ Start programs at a defined priority
 
 LICENSE
 ===============
-* Freeware
+* GNU GPL V2
 
 COMPILE TOOLS
 ===============
