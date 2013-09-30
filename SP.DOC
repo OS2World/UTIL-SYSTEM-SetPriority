@@ -1,18 +1,30 @@
-SetPriority Version 1.03 by Jens Glathe 05-16-1995
+SetPriority Version 1.04 by Jens Glathe 12-01-1995
 
 This is a utility to start a program at a defined priority.  It is also able to
 start a VDM (DOS-session) at a defined priority.
 
 What's new:
 
-There was a bug in the VDD "VDOSPRIO.SYS" (Version 1.0).  It has been rewritten
-completely.  A bug fix for the IdleCall (AX=1680h, Int 2F) in OS/2 version 2.1
-has been added (Version 2.0 of VDOSPRIO.SYS)
-An interface to query the actual priority of a DOS-Session has been added 
-(Version 2.2 of VDOSPRIO.SYS).
-Some error messages have been added to spdos.exe.
+An interface to the DOS settings of the WPS has been added. It provides the 
+two (or three, depends on the version of OS/2 you use) additional DOS set-
+tings:
 
-The file sp103.zip contains:
+SESSION_PRIORITY_API (default: on) Enables the VDD interface for this DOS box.
+        The API can be accessed through DOS interrupt 45h. This setting is for
+        programs that use the VDOSPRIO API (only three ones, AFAIK :).
+
+SESSION_PRIORITY_CLASS (default: 2) Sets the priority class for the program.
+        See below.
+
+SESSION_PRIORITY (default: 1) Sets the offset in the priority class for the 
+        program. See below.
+
+With this interface, you don't need to use sp.exe or spdos.exe to run a DOS 
+program at a defined priority. The only thing you need to do is to create an
+Object for the program and change the settings. Of course, you need to load 
+the driver VDOSPRIO.SYS at system boot :).
+
+The file sp104.zip contains:
 
 sp.exe OS/2 executable
 
@@ -38,9 +50,9 @@ Usage of sp:
 SP <class>[delta] <sessiontype> <program> [args...]
 
 <class>:  n=no change, i=idle, r=regular, f=foreground, t=time critical
-[delta]:  Any number from -31 to 31, 0 to 31 for DOS sessions <sessiontype>:
-o=OS/2 Window or PM App, d=DOS-Window, D=DOS-Fullscreen <program>:  Executable
-or Batchfile (OS/2 only) with full path
+[delta]:  Any number from -31 to 31, 0 to 31 for DOS sessions 
+<sessiontype>: o=OS/2 Window or PM App, d=DOS-Window 
+<program>:  Executable or Batchfile (OS/2 only) with full path
 
 The driver "VDOSPRIO.SYS" must have been loaded to change the priority of a DOS
 session.
@@ -66,17 +78,14 @@ Notes:
 The VDD hooks the DOS Int 45h to get a connection to the VDM.  I hope that
 nobody uses this Interrupt.  If there are problems with this Interrupt,
 recompile the VDD and the pascal library for another Interrupt. To obtain the 
-source code, just contact me by e-mail.
+source code, just contact me by e-mail (Or better: surface mail or phone).
 
 If you set a DOS session which has an idle loop consuming full cpu time (such
 as the Turbo IDE) to time critical (highest) priority, the system gets in
 trouble.  Setting the priority to r31 is enough, f is also allowed.
 
-There is another priority class for VDM's:  SIMULATED INTERRUPT, but it doesn't
-seem to work.  Therefore the sp utility doesn't support it.
-
-The Command-line parsing of SP is not very save:  You can get strange errors
-(such as illegal NPX instruction) when running SP with wrong arguments.
+There is another priority class for VDM's:  SIMULATED INTERRUPT, but it is 
+for VDD internal use only. Therefore the sp utility doesn't support it.
 
 FOR PROGRAMMERS WHO WANT TO USE THE VDOSPRIO DRIVER DIRECTLY:
 
@@ -87,7 +96,7 @@ AX:  Class
 Possible values are:
 
 1H:  Idle Class.  2H:  Regular Class.  3H:  Time-Critical Class.  Highest
-Priority class 4H:  Foreground Server Class.  5H:  Simulated Interrupt Class.
+Priority class. 4H:  Foreground Server Class.  5H:  Simulated Interrupt Class.
 1680H:  Perform a task switch to another task (Try to give up the CPU).
 
 DX:  Offset
@@ -110,7 +119,7 @@ DISCLAIMER OF WARRANTIES:
 
 Ich uebernehme keinerlei Gewaehrleistung fÅr korrekte Funktion oder
 irgendwelche daraus resultierenden Schaeden oder Folgeschaeden.  Es liegt in
-der Natur von Geraetettreibern, dass dadurch die Integritaet des Systems
+der Natur von Geraetetreibern, dass dadurch die Integritaet des Systems
 verletzt werden kann.
 
 Licence:  --------
@@ -123,7 +132,7 @@ Send it to me:
 
 Internet:  jensajce@w271zrz.ZRZ.TU-Berlin.de
 
-Normal letter:
+Surface mail:
 
 Jens Glathe
 Keithstr.  36 Apt.  604
@@ -131,9 +140,12 @@ D-10787 Berlin
 Germany
 
 Phone:  (030) 262 75 33
+           (0177) 230 09 94
 
 
 Debug-O-History:
+
+No new bugs fixed in version 1.04.
 
 The Version 1.03 has a VDD for the DOS sessions with more functionality.
 Some error messages have been added to spdos.exe.

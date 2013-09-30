@@ -1,0 +1,172 @@
+SetPriority Version 1.05 by Jens Glathe 06-06-1998
+
+This is a utility to start a program at a defined priority.  It is also able to
+start a VDM (DOS-session) at a defined priority.
+
+What's new:
+
+An interface to the DOS settings of the WPS has been added. It provides the 
+two (or three, depends on the version of OS/2 you use) additional DOS set-
+tings:
+
+SESSION_PRIORITY_API (default: on) Enables the VDD interface for this DOS box.
+        The API can be accessed through DOS interrupt 45h. This setting is for
+        programs that use the VDOSPRIO API (only three ones, AFAIK :).
+
+SESSION_PRIORITY_CLASS (default: 2) Sets the priority class for the program.
+        See below.
+
+SESSION_PRIORITY_OFFSET (default: 1) Sets the offset in the priority class for the 
+        program. See below.
+
+With this interface, you don't need to use sp.exe or spdos.exe to run a DOS 
+program at a defined priority. The only thing you need to do is to create an
+Object for the program and change the settings. Of course, you need to load 
+the driver VDOSPRIO.SYS at system boot :).
+
+The programs sp.exe and spdos.exe now return the returncode of the started 
+program to the command processor. With that, batch processing is a bit easier.
+
+
+The file sp105.zip contains:
+
+sp.exe OS/2 executable
+
+spdos.exe DOS executable to start a DOS session with other priority
+
+vdosprio.sys Virtual Device Driver for the DOS sessions (MUST be loaded to
+change the priority)
+
+setprio.pas, setprio.tpu,
+
+prioint.asm, prioint.obj source for the library used by spdos.exe
+
+setprio.c C header for communication with VDOSPRIO.SYS
+
+sp.doc this file.
+
+Usage of sp:
+
+SP <class>[delta] <sessiontype> <program> [args...]
+
+<class>:  n=no change, i=idle, r=regular, f=foreground, t=time critical
+[delta]:  Any number from -31 to 31, 0 to 31 for DOS sessions 
+<sessiontype>: o=OS/2 Window or PM App, d=DOS-Window 
+<program>:  Executable or Batchfile (OS/2 only) with full path
+
+The driver "VDOSPRIO.SYS" must have been loaded to change the priority of a DOS
+session.
+
+If a DOS session shall be started, sp invokes spdos.exe, which sets the
+priority of the VDM and executes the program.
+
+You can use spdos directly:
+
+SPDOS <class>[delta] <program_with_path_and_extension> [args...]
+
+If you want to run batch files, use:
+
+SPDOS <class>[delta] <path>\command.com /c <batchfile> [options]
+
+Requirements:
+
+OS/2 version 2.x. or higher. sp.exe and spdos.exe must be reachable by PATH or
+in the same directory.  DEVICE=(path)vdosprio.sys in your config.sys file.
+Also, you need the EMX Runtime Library to use this utility. You can find the
+Library on almost every OS/2 FTP-Server. If you don't want to use the EMX 
+Runtime, you can use the statically linked version of sp.exe in .\static.
+
+Notes:
+
+The VDD hooks the DOS Int 45h to get a connection to the VDM.  I hope that
+nobody uses this Interrupt.  If there are problems with this Interrupt,
+recompile the VDD and the pascal library for another Interrupt. To obtain the 
+source code, just contact me by e-mail (Or better: surface mail or phone).
+
+If you set a DOS session which has an idle loop consuming full cpu time (such
+as the Turbo IDE) to time critical (highest) priority, the system gets in
+trouble.  Setting the priority to r31 is enough, f is also allowed.
+
+There is another priority class for VDM's:  SIMULATED INTERRUPT, but it is 
+for VDD internal use only. Therefore the sp utility doesn't support it.
+
+FOR (Dos-Box) PROGRAMMERS WHO WANT TO USE THE VDOSPRIO DRIVER DIRECTLY:
+
+The driver can be called by Int 45h.  The parameters are:
+
+AX:  Class
+
+Possible values are:
+
+1H:  Idle Class.  
+2H:  Regular Class.  
+3H:  Time-Critical Class.  Highest Priority class. 
+4H:  Foreground Server Class.  
+5H:  Simulated Interrupt Class.
+1680H:  Perform a task switch to another task (Try to give up the CPU).
+
+DX:  Offset
+
+Possible values are:
+
+0..1Fh:  absolute Offset for this Class
+
+Return values:
+
+AX=1:  Success.  
+AX=0:  An error occured.  No actions taken.
+
+There is a better description and a pascal/c interface included with this
+package (Files setprio.pas and setprio.h, but partially in german :-) ).
+
+DISCLAIMER OF WARRANTIES:
+
+(I don't write legal stuff in a foreign language, sorry):
+----------------------------------------------------------------------
+
+Ich uebernehme keinerlei Gewaehrleistung fr korrekte Funktion oder
+irgendwelche daraus resultierenden Schaeden oder Folgeschaeden.  Es liegt in
+der Natur von Geraetetreibern, dass dadurch die Integritaet des Systems
+verletzt werden kann.
+
+Licence:  --------
+
+This is freeware. A postcard from your home town would be nice.
+
+Bug reports, hints, sourcecode queries, suggestions etc.:
+
+Send it to me:
+
+Internet:  jensajce@w271zrz.ZRZ.TU-Berlin.de
+
+Surface mail:
+
+Jens Glathe
+Meraner Straáe 33
+D-10825 Berlin
+Germany
+
+Phone:  +49 30 853 86 48 
+        +49 177 306 50 23 
+
+
+Debug-O-History:
+
+Version 1.05 has slight changes in the VDD, especially the 
+SESSION_PRIORITY_OFFSET WPS setting, which removes the odd behaviour off the 
+priority setting on OS/2 >2.11.
+
+No new bugs fixed in version 1.04.
+
+The Version 1.03 has a VDD for the DOS sessions with more functionality.
+Some error messages have been added to spdos.exe.
+No new bugs found.
+
+The Version 1.02 contains a completely rewritten VDD for the DOS sessions
+(VDOSPRIO.SYS version 2.0).
+
+The Version 1.01 has a minor bug fix in spdos.exe.  There was a problem passing
+argv[1] to the DOS program started.
+
+The initial code used as a base for sp.exe is from Scott Dudley, thanks to him.
+
