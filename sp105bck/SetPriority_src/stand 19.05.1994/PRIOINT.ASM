@@ -1,0 +1,22 @@
+.MODEL TPASCAL
+
+.286
+
+.CODE
+
+PUBLIC SetPriority
+SetPriority PROC FAR
+	PUSH BP
+	MOV BP, SP
+
+.386
+	MOV EAX, DWORD PTR SS:[BP+0ah]
+	MOV EDX, DWORD PTR SS:[BP+06h]
+	INT 45h
+
+.286
+	LEAVE
+	RET 8
+SetPriority ENDP
+
+END
